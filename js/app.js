@@ -221,6 +221,120 @@ function showToast(message, type = 'success') {
   }, 3200);
 }
 
+// Construction Catalog by Category (Dynamic Dropdown Options)
+const CATALOGO_OBRA = {
+  materiales: [
+    { label: '🧱 Cemento Gris (Bulto 50kg)', unit: 'bultos' },
+    { label: '🚛 Arena de Río Lavada', unit: 'm³' },
+    { label: '🪨 Gravilla / Triturado', unit: 'm³' },
+    { label: '🔩 Varilla Corrugada 1/2"', unit: 'unidades' },
+    { label: '🔩 Varilla Corrugada 3/8"', unit: 'unidades' },
+    { label: '🧱 Ladrillo Tolete / Bloque N°4', unit: 'unidades' },
+    { label: '⛓️ Alambre Recocido / Puntillas', unit: 'kg' },
+    { label: '🕸️ Malla Electrosoldada', unit: 'unidades' },
+    { label: '🚰 Tubería y Accesorios PVC', unit: 'unidades' },
+    { label: '⚡ Cableado y Material Eléctrico', unit: 'metros' },
+    { label: '🎨 Estuco, Pintura y Acabados', unit: 'galones' },
+    { label: '🪵 Madera / Tabla / Guadua', unit: 'unidades' },
+    { label: '✨ Cerámica / Porcelanato / Pegante', unit: 'm²' },
+    { label: '💧 Impermeabilizante / Aditivos', unit: 'galones' },
+    { label: '__custom__', text: '✍️ Otro material (Especificar)...', unit: 'unidades' }
+  ],
+  'mano-obra': [
+    { label: '👷 Pago Semanal Maestro de Obra', unit: 'semanas' },
+    { label: '👷‍♂️ Jornal Diario Ayudante / Oficial', unit: 'días' },
+    { label: '🧱 Mano de Obra Mampostería y Pañete', unit: 'global' },
+    { label: '🏗️ Mano de Obra Estructura / Fundición', unit: 'global' },
+    { label: '⚡ Instalaciones Eléctricas (Mano de Obra)', unit: 'global' },
+    { label: '🚰 Instalaciones Hidrosanitarias (Plomería)', unit: 'global' },
+    { label: '🎨 Mano de Obra Estuco, Pintura y Enchape', unit: 'global' },
+    { label: '🏠 Instalación de Cubierta / Techo', unit: 'global' },
+    { label: '__custom__', text: '✍️ Otro pago de mano de obra (Especificar)...', unit: 'global' }
+  ],
+  herramientas: [
+    { label: '🔄 Alquiler de Mezcladora (Trompo)', unit: 'días' },
+    { label: '🪜 Alquiler de Andamios y Tableros', unit: 'días' },
+    { label: '🔨 Compra de Herramienta Menor (Palas, Picas)', unit: 'unidades' },
+    { label: '⚙️ Discos de Corte, Brocas y Pulidora', unit: 'unidades' },
+    { label: '🛒 Carretilla Buggy de Obra', unit: 'unidades' },
+    { label: '⚡ Alquiler de Rana Compactadora / Vibrador', unit: 'días' },
+    { label: '__custom__', text: '✍️ Otra herramienta o equipo (Especificar)...', unit: 'unidades' }
+  ],
+  varios: [
+    { label: '🚚 Flete / Transporte de Materiales', unit: 'viajes' },
+    { label: '⚡ Pago de Servicios Provisionales (Agua / Luz)', unit: 'global' },
+    { label: '📄 Licencias, Planos y Trámites', unit: 'global' },
+    { label: '🗑️ Retiro de Escombros (Volqueta)', unit: 'viajes' },
+    { label: '🥤 Refrigerios e Hidratación Personal', unit: 'global' },
+    { label: '🔒 Seguridad y Cerramiento de Obra', unit: 'global' },
+    { label: '__custom__', text: '✍️ Otro gasto vario (Especificar)...', unit: 'global' }
+  ]
+};
+
+// Populate Concepto Select based on Category
+function populateConceptoDropdown(catId) {
+  const selectEl = document.getElementById('quickConceptoSelect');
+  const unitEl = document.getElementById('quickUnidad');
+  const customBox = document.getElementById('customConceptoBox');
+  if (!selectEl) return;
+
+  const list = CATALOGO_OBRA[catId] || CATALOGO_OBRA.materiales;
+  selectEl.innerHTML = list.map((item, idx) => {
+    const val = item.label === '__custom__' ? '__custom__' : item.label;
+    const text = item.text || item.label;
+    return `<option value="${escapeHtml(val)}" data-unit="${item.unit}" ${idx === 0 ? 'selected' : ''}>${escapeHtml(text)}</option>`;
+  }).join('');
+
+  // Auto-update unit to match first item
+  if (unitEl && list[0]) {
+    unitEl.value = list[0].unit;
+  }
+  if (customBox) {
+    customBox.style.display = 'none';
+  }
+}
+
+// Handle Category Dropdown Change
+function handleQuickCategoryChange(catId) {
+  currentCategory = catId;
+  populateConceptoDropdown(catId);
+  playMicroClick();
+}
+
+// Handle Concepto Dropdown Change
+function handleQuickConceptoChange(val) {
+  const selectEl = document.getElementById('quickConceptoSelect');
+  const customBox = document.getElementById('customConceptoBox');
+  const customInput = document.getElementById('quickDescripcionCustom');
+  const unitEl = document.getElementById('quickUnidad');
+
+  if (val === '__custom__') {
+    if (customBox) customBox.style.display = 'block';
+    if (customInput) customInput.focus();
+  } else {
+    if (customBox) customBox.style.display = 'none';
+    // Set recommended unit from selected option
+    if (selectEl && unitEl) {
+      const selectedOpt = selectEl.options[selectEl.selectedIndex];
+      const recommendedUnit = selectedOpt?.getAttribute('data-unit');
+      if (recommendedUnit) unitEl.value = recommendedUnit;
+    }
+  }
+  playMicroClick();
+}
+
+// Handle Proveedor Dropdown Change
+function handleQuickProveedorChange(val) {
+  const customBox = document.getElementById('customProveedorBox');
+  const customInput = document.getElementById('quickResponsableCustom');
+  if (val === '__custom__') {
+    if (customBox) customBox.style.display = 'block';
+    if (customInput) customInput.focus();
+  } else {
+    if (customBox) customBox.style.display = 'none';
+  }
+}
+
 // Simplified Quick Amount Handling
 let rawQuickAmount = 0;
 
@@ -244,7 +358,7 @@ function updateQuickAmountFromInput() {
   if (rawQuickAmount > 0) {
     input.value = formatRawAmount(rawQuickAmount);
     if (wordsEl) {
-      wordsEl.textContent = formatMoney(rawQuickAmount);
+      wordsEl.textContent = `Valor confirmado: ${formatMoney(rawQuickAmount)}`;
       wordsEl.style.color = 'var(--neon-cyan)';
     }
     if (btnText) {
@@ -253,42 +367,12 @@ function updateQuickAmountFromInput() {
   } else {
     input.value = '';
     if (wordsEl) {
-      wordsEl.textContent = 'Ingresa el valor total';
-      wordsEl.style.color = 'var(--text-muted)';
+      wordsEl.textContent = 'Toca aquí para ingresar el valor';
+      wordsEl.style.color = 'var(--text-secondary)';
     }
     if (btnText) {
       btnText.textContent = 'Registrar Gasto';
     }
-  }
-}
-
-// 1-Tap Quick Suggestions
-function setQuickSuggestion(desc, catId) {
-  const descInput = document.getElementById('quickDescripcion');
-  const amountInput = document.getElementById('quickMontoDisplay');
-  
-  if (descInput) {
-    descInput.value = desc;
-  }
-
-  // Switch category button
-  if (catId) {
-    currentCategory = catId;
-    const catBtns = document.querySelectorAll('.cat-btn');
-    catBtns.forEach(btn => {
-      if (btn.dataset.cat === catId) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-
-  playMicroClick();
-
-  // Focus amount for instant entry
-  if (amountInput) {
-    amountInput.focus();
   }
 }
 
@@ -304,10 +388,10 @@ function toggleQuickDetails() {
     box.style.display = detailsExpanded ? 'flex' : 'none';
   }
   if (icon) {
-    icon.textContent = detailsExpanded ? '−' : '+';
+    icon.textContent = detailsExpanded ? '▴' : '▾';
   }
   if (text) {
-    text.textContent = detailsExpanded ? 'Ocultar detalles adicionales' : 'Añadir detalles (Cantidad, Proveedor, Fecha)';
+    text.textContent = detailsExpanded ? 'Ocultar opciones adicionales' : 'Opciones adicionales (Cantidad, Unidad, Proveedor, Fecha)';
   }
   playMicroClick();
 }
@@ -339,23 +423,41 @@ function updateEditTotal() {
   }
 }
 
-// Quick Register Form Submission (Ultra Easy & Streamlined)
+// Quick Register Form Submission (Professional Dropdown Driven)
 function handleQuickRegister(e) {
   e.preventDefault();
   
-  const descripcion = document.getElementById('quickDescripcion').value.trim();
   const monto = rawQuickAmount;
-
   if (!monto || monto <= 0) {
-    showToast('Ingresa el valor o costo del gasto', 'error');
+    showToast('Ingresa el monto total del gasto', 'error');
     document.getElementById('quickMontoDisplay')?.focus();
     return;
   }
 
-  if (!descripcion) {
-    showToast('Escribe qué compraste o pagaste', 'error');
-    document.getElementById('quickDescripcion')?.focus();
-    return;
+  // Get selected category
+  const catSelect = document.getElementById('quickCategoriaSelect');
+  const categoria = catSelect ? catSelect.value : currentCategory;
+
+  // Get selected material/concepto or custom input
+  const conceptoSelect = document.getElementById('quickConceptoSelect');
+  let descripcion = conceptoSelect ? conceptoSelect.value : '';
+  // Remove leading emoji for clean record if desired, or keep it clean
+  descripcion = descripcion.replace(/^[^\w\sÁÉÍÓÚáéíóúÑñ]+\s*/, '').trim();
+
+  if (conceptoSelect && conceptoSelect.value === '__custom__') {
+    const customDesc = (document.getElementById('quickDescripcionCustom')?.value || '').trim();
+    if (!customDesc) {
+      showToast('Especifica el nombre del material o gasto', 'error');
+      document.getElementById('quickDescripcionCustom')?.focus();
+      return;
+    }
+    descripcion = customDesc;
+  }
+
+  // Append optional extra note if provided
+  const notaExtra = (document.getElementById('quickNotaExtra')?.value || '').trim();
+  if (notaExtra) {
+    descripcion = `${descripcion} (${notaExtra})`;
   }
 
   // Read optional details or apply smart defaults
@@ -363,14 +465,20 @@ function handleQuickRegister(e) {
   const cantidad = parseFloat(document.getElementById('quickCantidad')?.value) || 1;
   const unidad = document.getElementById('quickUnidad')?.value || 'global';
   const fecha = document.getElementById('quickFecha')?.value || today;
-  const responsable = (document.getElementById('quickResponsable')?.value || '').trim() || 'Obra';
+
+  // Provider dropdown or custom
+  const provSelect = document.getElementById('quickProveedorSelect');
+  let responsable = provSelect ? provSelect.value : 'Ferretería General';
+  if (responsable === '__custom__') {
+    responsable = (document.getElementById('quickResponsableCustom')?.value || '').trim() || 'Obra';
+  }
 
   const costoTotal = monto;
-  const costoUnitario = cantidad > 0 ? (costoTotal / cantidad) : costoTotal;
+  const costoUnitario = cantidad > 0 ? Math.round(costoTotal / cantidad) : costoTotal;
 
   const newExpense = {
     id: 'gasto-' + Date.now(),
-    categoria: currentCategory,
+    categoria,
     descripcion,
     cantidad,
     unidad,
@@ -387,13 +495,17 @@ function handleQuickRegister(e) {
   rawQuickAmount = 0;
   const amountInput = document.getElementById('quickMontoDisplay');
   if (amountInput) amountInput.value = '';
-  document.getElementById('quickDescripcion').value = '';
-  document.getElementById('quickResponsable').value = '';
+  const customDescEl = document.getElementById('quickDescripcionCustom');
+  if (customDescEl) customDescEl.value = '';
+  const notaExtraEl = document.getElementById('quickNotaExtra');
+  if (notaExtraEl) notaExtraEl.value = '';
+  const customProvEl = document.getElementById('quickResponsableCustom');
+  if (customProvEl) customProvEl.value = '';
   document.getElementById('quickCantidad').value = '1';
-  document.getElementById('quickUnidad').value = 'global';
+  populateConceptoDropdown(categoria);
   updateQuickAmountFromInput();
 
-  showToast('✓ Gasto registrado con éxito', 'success');
+  showToast('✓ Gasto registrado correctamente', 'success');
   updateTodaySummary();
   renderQuickRecentList();
   renderAdminDashboard();
@@ -946,16 +1058,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickDateInput = document.getElementById('quickFecha');
   if (quickDateInput) quickDateInput.value = today;
 
-  // Category Selector Buttons (.cat-btn)
-  const catBtns = document.querySelectorAll('.cat-btn');
-  catBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      catBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCategory = btn.dataset.cat;
-      playMicroClick();
-    });
-  });
+  // Initialize dynamic concept dropdown for default category ('materiales')
+  populateConceptoDropdown('materiales');
 
   // Large Amount Input Formatting
   const amountInput = document.getElementById('quickMontoDisplay');
