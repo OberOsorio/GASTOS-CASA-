@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Control de Gastos de Construcción | Obra Viva</title>
+  <meta name="description" content="Aplicación web moderna y minimalista para el control y registro ágil de gastos de construcción de vivienda.">
+  <meta name="theme-color" content="#04060B">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- SheetJS for Clean Excel Export -->
+  <script src="js/xlsx.full.min.js"></script>
+</head>
+<body class="hw-accel">
+
+  <!-- Ambient background glow elements -->
+  <div style="position:fixed; top:-120px; left:50%; transform:translateX(-50%); width:600px; height:350px; background:radial-gradient(circle, rgba(0, 210, 255, 0.12) 0%, transparent 70%); pointer-events:none; z-index:0;"></div>
+
+  <!-- Main Navigation Bar -->
+  <header style="position:sticky; top:0; z-index:50; background:rgba(4, 6, 11, 0.75); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border-subtle);">
+    <div style="max-width:1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+      
+      <!-- Logo & App Title -->
+      <div style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="navigateTo('quickView')">
+        <div style="width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg, rgba(0,210,255,0.2) 0%, rgba(0,102,255,0.2) 100%); border:1px solid var(--border-accent); display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px var(--neon-cyan-glow);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00D2FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div style="font-weight:800; font-size:16px; letter-spacing:-0.3px; color:#FFFFFF; display:flex; align-items:center; gap:6px;">
+            OBRA<span style="color:var(--neon-cyan);">CONTROL</span>
+            <span id="adminStatusIndicator" class="badge" style="display:none; background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3); font-size:10px; padding:2px 6px;">ADMIN</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); font-weight:500;">Gastos de Construcción Casa</div>
+        </div>
+      </div>
+
+      <!-- Header Action Controls -->
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="btn-secondary" onclick="navigateTo('quickView')" style="padding:8px 14px; font-size:13px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span style="display:none; sm:inline;">Registro</span>
+        </button>
+        <button class="btn-primary" onclick="navigateTo('adminView')" style="padding:8px 16px; font-size:13px; font-weight:700;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#04060B" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span>Panel Admin</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main style="max-width:1100px; margin:0 auto; padding:24px 16px 80px 16px; position:relative; z-index:1;">
+
+    <!-- ========================================== -->
+    <!-- FLOW A: REGISTRO RÁPIDO (PÁGINA PRINCIPAL)  -->
+    <!-- ========================================== -->
+    <section id="quickView">
+      
+      <!-- Hero Intro -->
+      <div style="text-align:center; margin-bottom:28px;">
+        <div class="badge" style="background:rgba(0,210,255,0.1); color:var(--neon-cyan); border:1px solid rgba(0,210,255,0.25); margin-bottom:10px;">
+          ⚡ Registro Rápido en Obra
+        </div>
+        <h1 style="font-size:28px; font-weight:800; color:#FFFFFF; letter-spacing:-0.5px; margin-bottom:6px;">
+          Nuevo Registro de Gasto
+        </h1>
+        <p style="font-size:14px; color:var(--text-secondary); max-width:480px; margin:0 auto;">
+          Ingresa de forma inmediata las compras de material, pagos de jornales o compras imprevistas desde cualquier dispositivo móvil.
+        </p>
+      </div>
+
+      <!-- Quick Register Glass Card -->
+      <div class="glass-panel" style="max-width:640px; margin:0 auto; padding:24px 20px;">
+        <form id="quickRegisterForm" style="display:flex; flex-direction:column; gap:20px;">
+          
+          <!-- 1. Category Selector -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>1. Categoría de Gasto</span>
+              <span style="font-size:11px; color:var(--neon-cyan);">Selección rápida</span>
+            </label>
+            <div class="category-grid">
+              
+              <div class="cat-pill active" data-cat="materiales">
+                <div class="cat-icon" style="background:rgba(0,210,255,0.15); color:#00D2FF;">🧱</div>
+                <div class="cat-name">Materiales</div>
+              </div>
+
+              <div class="cat-pill" data-cat="mano-obra">
+                <div class="cat-icon" style="background:rgba(16,185,129,0.15); color:#10B981;">👷</div>
+                <div class="cat-name">Mano de Obra</div>
+              </div>
+
+              <div class="cat-pill" data-cat="herramientas">
+                <div class="cat-icon" style="background:rgba(245,158,11,0.15); color:#F59E0B;">🔨</div>
+                <div class="cat-name">Herramientas</div>
+              </div>
+
+              <div class="cat-pill" data-cat="varios">
+                <div class="cat-icon" style="background:rgba(168,85,247,0.15); color:#A855F7;">📦</div>
+                <div class="cat-name">Gastos Varios</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 2. Description & Quick Chips -->
+          <div class="form-group">
+            <label class="form-label" for="quickDescripcion">
+              <span>2. Descripción del Gasto / Artículo</span>
+            </label>
+            <input 
+              type="text" 
+              id="quickDescripcion" 
+              class="form-input" 
+              placeholder="Ej. Cemento Argos x 50 bultos, Pago semanal maestro Juan..."
+              required
+              autocomplete="off"
+            >
+            <!-- Quick Suggestion Chips -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Cemento Gris x 50 bultos'; updateQuickTotal();">Cemento Gris</span>
+              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Arena lavada de río'; updateQuickTotal();">Arena de río</span>
+              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Jornal semanal Maestro de Obra'; updateQuickTotal();">Jornal Maestro</span>
+              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Varilla corrugada 1/2 pulgada'; updateQuickTotal();">Varilla 1/2</span>
+              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Flete y transporte de materiales'; updateQuickTotal();">Flete</span>
+            </div>
+          </div>
+
+          <!-- 3. Quantity and Unit (2 columns) -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label" for="quickCantidad">3. Cantidad</label>
+              <input 
+                type="number" 
+                id="quickCantidad" 
+                class="form-input" 
+                value="1" 
+                min="0.01" 
+                step="any" 
+                required
+              >
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="quickUnidad">Unidad de Medida</label>
+              <select id="quickUnidad" class="form-select">
+                <option value="unidades">Unidades (und)</option>
+                <option value="bultos" selected>Bultos (blt)</option>
+                <option value="metros">Metros lineales (m)</option>
+                <option value="m³">Metros cúbicos (m³)</option>
+                <option value="m²">Metros cuadrados (m²)</option>
+                <option value="días">Días de labor</option>
+                <option value="semanas">Semanas</option>
+                <option value="viajes">Viajes / Fletes</option>
+                <option value="global">Global (Todo costo)</option>
+                <option value="kg">Kilos (kg)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 4. Unit Cost & Real-Time Calculation -->
+          <div class="form-group">
+            <label class="form-label" for="quickCostoUnitario">
+              <span>4. Costo Unitario ($)</span>
+              <span style="font-size:11px; color:var(--text-muted);">Por unidad/bulto/día</span>
+            </label>
+            <div class="input-with-icon">
+              <span class="input-icon">$</span>
+              <input 
+                type="number" 
+                id="quickCostoUnitario" 
+                class="form-input" 
+                placeholder="Ej. 32000" 
+                min="0" 
+                step="any" 
+                required
+              >
+            </div>
+          </div>
+
+          <!-- Real-Time Total Highlight Card -->
+          <div class="total-highlight-card">
+            <div>
+              <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Costo Total Estimado</div>
+              <div style="font-size:12px; color:var(--text-secondary);">Cantidad × Costo Unitario</div>
+            </div>
+            <div id="quickTotalDisplay" class="total-value-display">
+              $ 0
+            </div>
+          </div>
+
+          <!-- 5. Date and Responsible Person / Supplier -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label" for="quickFecha">5. Fecha</label>
+              <input type="date" id="quickFecha" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="quickResponsable">Responsable / Proveedor</label>
+              <input 
+                type="text" 
+                id="quickResponsable" 
+                class="form-input" 
+                placeholder="Ej. Ferretería El Sol"
+              >
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-primary" style="margin-top:6px; font-size:16px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04060B" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Registrar Gasto en Obra
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Recent Expenses Section -->
+      <div style="max-width:640px; margin:32px auto 0 auto;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding:0 4px;">
+          <h3 style="font-size:16px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+            <span>⏱️</span> Últimos Gastos Registrados
+          </h3>
+          <button class="btn-secondary" onclick="navigateTo('adminView')" style="padding:6px 12px; font-size:12px;">
+            Ver todos en Admin →
+          </button>
+        </div>
+        <div id="quickRecentList" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Subtle Admin Access Footer Banner -->
+      <div style="max-width:640px; margin:40px auto 0 auto; text-align:center; padding:18px; border-top:1px solid var(--border-subtle);">
+        <button onclick="navigateTo('loginView')" style="background:transparent; border:none; color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:color 0.2s;" onmouseover="this.style.color='var(--neon-cyan)'" onmouseout="this.style.color='var(--text-muted)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Acceso Administrativo al Panel de Control
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- FLOW B: LOGIN DE ADMINISTRADOR             -->
+    <!-- ========================================== -->
+    <section id="loginView" style="display:none;">
+      <div style="max-width:440px; margin:40px auto; padding:0 10px;">
+        
+        <div class="glass-panel" style="padding:32px 24px;">
+          
+          <div style="text-align:center; margin-bottom:26px;">
+            <div style="width:50px; height:50px; border-radius:16px; background:linear-gradient(135deg, rgba(0,210,255,0.2) 0%, rgba(0,102,255,0.2) 100%); border:1px solid var(--border-accent); display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto; box-shadow:0 0 20px var(--neon-cyan-glow);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00D2FF" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 style="font-size:22px; font-weight:800; color:#FFFFFF; margin-bottom:6px;">Acceso de Administrador</h2>
+            <p style="font-size:13px; color:var(--text-secondary);">Ingresa tus credenciales para ver reportes, editar gastos y exportar a Excel.</p>
+          </div>
+
+          <form id="loginForm" style="display:flex; flex-direction:column; gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="loginUser">Usuario</label>
+              <div class="input-with-icon">
+                <span class="input-icon">👤</span>
+                <input type="text" id="loginUser" class="form-input" value="admin" required autocomplete="username">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="loginPass">Contraseña</label>
+              <div class="input-with-icon">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+              </div>
+            </div>
+
+            <!-- Demo Hint -->
+            <div style="background:rgba(0,210,255,0.06); border:1px dashed rgba(0,210,255,0.25); border-radius:10px; padding:10px 12px; font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
+              <span>Credenciales por defecto:</span>
+              <code style="color:var(--neon-cyan); font-family:'JetBrains Mono',monospace; font-weight:600;">admin / cotorra2026</code>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top:6px;">
+              Iniciar Sesión en Panel
+            </button>
+            
+            <button type="button" class="btn-secondary" onclick="navigateTo('quickView')" style="margin-top:4px;">
+              ← Volver al Registro Rápido
+            </button>
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- FLOW C: PANEL ADMINISTRATIVO (DASHBOARD)   -->
+    <!-- ========================================== -->
+    <section id="adminView" style="display:none;">
+
+      <!-- Admin Header Bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+        <div>
+          <div class="badge" style="background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3); margin-bottom:6px;">
+            ● Panel Administrativo Seguro
+          </div>
+          <h1 style="font-size:26px; font-weight:800; color:#FFFFFF; letter-spacing:-0.4px;">
+            Tablero de Control de Obra
+          </h1>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="navigateTo('quickView')" style="padding:9px 14px; font-size:13px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Nuevo Gasto
+          </button>
+
+          <!-- Highlighted Excel Export Button with SheetJS -->
+          <button class="btn-primary" onclick="exportToExcel()" style="padding:9px 18px; font-size:13px; background:linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow:0 4px 20px rgba(16,185,129,0.3);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span style="color:#FFFFFF; font-weight:700;">Exportar a Excel (.xlsx)</span>
+          </button>
+
+          <!-- Logout Button -->
+          <button class="btn-secondary" onclick="handleLogout()" style="padding:9px 12px; font-size:13px; color:#F87171; border-color:rgba(248,113,113,0.25);" title="Cerrar sesión">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Salir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Real-Time Key Performance Indicators (KPIs) -->
+      <div style="display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:24px;">
+        
+        <!-- Main Total Card (Prominent) -->
+        <div class="glass-panel" style="padding:22px 24px; background:linear-gradient(135deg, rgba(13,20,38,0.85) 0%, rgba(0,102,255,0.15) 100%); border-color:var(--border-accent);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.8px;">Inversión Total Acumulada</div>
+              <div id="kpiTotal" style="font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:800; color:#FFFFFF; text-shadow:0 0 24px rgba(0,210,255,0.4); margin-top:4px;">
+                $ 0
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="badge" style="background:rgba(0,210,255,0.15); color:var(--neon-cyan); border:1px solid rgba(0,210,255,0.3); font-size:12px; padding:6px 12px;">
+                Corte en Vivo
+              </span>
+            </div>
+          </div>
+
+          <!-- Distribution Progress Bar -->
+          <div style="margin-top:18px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:600;">
+              <span>Distribución por categoría</span>
+              <span>100% de la obra</span>
+            </div>
+            <div id="distProgressBar" style="width:100%; height:8px; border-radius:9999px; overflow:hidden; background:rgba(255,255,255,0.06); display:flex;">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Sub-Category KPI Cards -->
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;" class="kpi-grid">
+          
+          <!-- Materiales -->
+          <div class="glass-card" style="padding:16px; border-left:3px solid var(--cat-materiales);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">🧱 Materiales</span>
+              <span id="pctMateriales" class="badge badge-materiales" style="font-size:10px;">0%</span>
+            </div>
+            <div id="kpiMateriales" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--cat-materiales); margin-top:8px;">
+              $ 0
+            </div>
+          </div>
+
+          <!-- Mano de Obra -->
+          <div class="glass-card" style="padding:16px; border-left:3px solid var(--cat-mano-obra);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">👷 Mano de Obra</span>
+              <span id="pctManoObra" class="badge badge-mano-obra" style="font-size:10px;">0%</span>
+            </div>
+            <div id="kpiManoObra" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--cat-mano-obra); margin-top:8px;">
+              $ 0
+            </div>
+          </div>
+
+          <!-- Herramientas -->
+          <div class="glass-card" style="padding:16px; border-left:3px solid var(--cat-herramientas);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">🔨 Herramientas</span>
+              <span id="pctHerramientas" class="badge badge-herramientas" style="font-size:10px;">0%</span>
+            </div>
+            <div id="kpiHerramientas" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--cat-herramientas); margin-top:8px;">
+              $ 0
+            </div>
+          </div>
+
+          <!-- Gastos Varios -->
+          <div class="glass-card" style="padding:16px; border-left:3px solid var(--cat-varios);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">📦 Gastos Varios</span>
+              <span id="pctVarios" class="badge badge-varios" style="font-size:10px;">0%</span>
+            </div>
+            <div id="kpiVarios" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--cat-varios); margin-top:8px;">
+              $ 0
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Donut Chart & Distribution Summary Section -->
+      <div class="glass-panel" style="padding:20px 24px; margin-bottom:24px;">
+        <div style="font-size:14px; font-weight:700; color:#FFFFFF; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+          <span>📊</span> Resumen Gráfico de la Inversión
+        </div>
+        <div id="donutChartContainer">
+          <!-- Dynamically populated SVG Donut -->
+        </div>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div class="glass-panel" style="padding:16px 20px; margin-bottom:18px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          
+          <!-- Search Bar -->
+          <div class="input-with-icon">
+            <span class="input-icon">🔍</span>
+            <input 
+              type="text" 
+              id="adminSearchInput" 
+              class="form-input" 
+              placeholder="Buscar por descripción, proveedor, fecha o unidad..."
+              style="padding-left:42px;"
+            >
+          </div>
+
+          <!-- Category Filter Pills & Count -->
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="filter-btn active badge" data-filter="all" style="cursor:pointer; padding:6px 14px; font-size:12px;">Todos</button>
+              <button class="filter-btn badge" data-filter="materiales" style="cursor:pointer; padding:6px 14px; font-size:12px;">🧱 Materiales</button>
+              <button class="filter-btn badge" data-filter="mano-obra" style="cursor:pointer; padding:6px 14px; font-size:12px;">👷 Mano de Obra</button>
+              <button class="filter-btn badge" data-filter="herramientas" style="cursor:pointer; padding:6px 14px; font-size:12px;">🔨 Herramientas</button>
+              <button class="filter-btn badge" data-filter="varios" style="cursor:pointer; padding:6px 14px; font-size:12px;">📦 Varios</button>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+              Mostrando: <span id="filteredCountBadge" style="color:#FFFFFF; font-weight:700;">0 de 0</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Expense List Container (Responsive Table on Desktop, Cards on Mobile) -->
+      <div class="glass-panel" style="padding:0; overflow:hidden;">
+        
+        <!-- Desktop Table (hidden on small screens) -->
+        <div class="desktop-table-container" style="display:none; overflow-x:auto;">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Categoría</th>
+                <th>Descripción / Responsable</th>
+                <th>Cantidad</th>
+                <th>Costo Unitario</th>
+                <th>Costo Total</th>
+                <th style="text-align:right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards Container (shown on mobile) -->
+        <div id="adminCardsContainer" class="mobile-cards-container" style="display:flex; flex-direction:column; gap:10px; padding:16px;">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="adminEmptyState" style="display:none; padding:48px 20px; text-align:center;">
+          <div style="font-size:36px; margin-bottom:10px;">📋</div>
+          <div style="font-size:16px; font-weight:700; color:#FFFFFF; margin-bottom:4px;">No se encontraron gastos</div>
+          <p style="font-size:13px; color:var(--text-muted); max-width:340px; margin:0 auto 16px auto;">
+            No hay registros que coincidan con la búsqueda o filtro seleccionado.
+          </p>
+          <button class="btn-secondary" onclick="loadDemoData()" style="padding:8px 16px; font-size:12px;">
+            Cargar Datos de Ejemplo
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Table Utilities Footer -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:20px; padding:0 4px;">
+        <button class="btn-secondary" onclick="loadDemoData()" style="padding:8px 14px; font-size:12px;">
+          🔄 Restaurar datos demo
+        </button>
+        <button class="btn-secondary" onclick="clearAllExpenses()" style="padding:8px 14px; font-size:12px; color:#F87171; border-color:rgba(248,113,113,0.3);">
+          🗑️ Vaciar todos los gastos
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: EDITAR GASTO                        -->
+  <!-- ========================================== -->
+  <div id="editModalOverlay" class="modal-overlay">
+    <div class="glass-panel modal-content" style="padding:24px;">
+      
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+        <h3 style="font-size:18px; font-weight:700; color:#FFFFFF;">Editar Registro de Gasto</h3>
+        <button class="btn-icon" onclick="closeEditModal()" style="border-radius:50%;">✕</button>
+      </div>
+
+      <form id="editExpenseForm" style="display:flex; flex-direction:column; gap:14px;">
+        <input type="hidden" id="editId">
+
+        <div class="form-group">
+          <label class="form-label" for="editCategoria">Categoría</label>
+          <select id="editCategoria" class="form-select">
+            <option value="materiales">🧱 Materiales</option>
+            <option value="mano-obra">👷 Mano de Obra</option>
+            <option value="herramientas">🔨 Herramientas</option>
+            <option value="varios">📦 Gastos Varios</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editDescripcion">Descripción</label>
+          <input type="text" id="editDescripcion" class="form-input" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label" for="editCantidad">Cantidad</label>
+            <input type="number" id="editCantidad" class="form-input" min="0.01" step="any" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editUnidad">Unidad</label>
+            <select id="editUnidad" class="form-select">
+              <option value="unidades">Unidades</option>
+              <option value="bultos">Bultos</option>
+              <option value="metros">Metros</option>
+              <option value="m³">m³</option>
+              <option value="m²">m²</option>
+              <option value="días">Días</option>
+              <option value="semanas">Semanas</option>
+              <option value="viajes">Viajes</option>
+              <option value="global">Global</option>
+              <option value="kg">Kg</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editCostoUnitario">Costo Unitario ($)</label>
+          <input type="number" id="editCostoUnitario" class="form-input" min="0" step="any" required>
+        </div>
+
+        <!-- Total calculated in modal -->
+        <div class="total-highlight-card" style="padding:12px 16px;">
+          <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Nuevo Costo Total:</span>
+          <span id="editTotalDisplay" style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:var(--neon-cyan);">$ 0</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label" for="editFecha">Fecha</label>
+            <input type="date" id="editFecha" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editResponsable">Responsable</label>
+            <input type="text" id="editResponsable" class="form-input">
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CONFIRMAR ELIMINACIÓN               -->
+  <!-- ========================================== -->
+  <div id="deleteModalOverlay" class="modal-overlay">
+    <div class="glass-panel modal-content" style="max-width:400px; padding:24px; text-align:center;">
+      <div style="width:48px; height:48px; border-radius:50%; background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </div>
+      <h3 style="font-size:18px; font-weight:700; color:#FFFFFF; margin-bottom:8px;">¿Eliminar este gasto?</h3>
+      <p id="deleteModalDesc" style="font-size:13px; color:var(--text-secondary); margin-bottom:20px; word-break:break-word;">
+        Esta acción eliminará el registro de forma permanente.
+      </p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn-secondary" onclick="closeDeleteModal()" style="flex:1;">Cancelar</button>
+        <button class="btn-primary" onclick="executeDeleteExpense()" style="flex:1; background:linear-gradient(135deg, #F43F5E 0%, #E11D48 100%); box-shadow:0 4px 16px rgba(244,63,94,0.3); color:#FFFFFF;">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Media Queries for Responsive Views -->
+  <style>
+    @media (min-width: 768px) {
+      .desktop-table-container {
+        display: block !important;
+      }
+      .mobile-cards-container {
+        display: none !important;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
+    }
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+    }
+    .filter-btn.active {
+      background: rgba(0, 210, 255, 0.15) !important;
+      color: var(--neon-cyan) !important;
+      border-color: var(--neon-cyan) !important;
+      box-shadow: 0 0 12px var(--neon-cyan-glow);
+    }
+  </style>
+
+  <!-- Application Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
