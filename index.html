@@ -62,185 +62,171 @@
     <!-- ========================================== -->
     <section id="quickView">
       
-      <!-- Hero Intro -->
-      <div style="text-align:center; margin-bottom:28px;">
-        <div class="badge" style="background:rgba(0,210,255,0.1); color:var(--neon-cyan); border:1px solid rgba(0,210,255,0.25); margin-bottom:10px;">
-          ⚡ Registro Rápido en Obra
+      <!-- Hero Header Ultra-Limpio -->
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); padding:6px 14px; border-radius:9999px; margin-bottom:10px;">
+          <span style="font-size:12px; font-weight:700; color:var(--neon-cyan);">⚡ Registro Rápido</span>
+          <span style="width:4px; height:4px; border-radius:50%; background:var(--text-muted);"></span>
+          <span id="quickTodaySummary" style="font-size:12px; color:var(--text-secondary); font-family:'JetBrains Mono',monospace;">Hoy: $ 0</span>
         </div>
-        <h1 style="font-size:28px; font-weight:800; color:#FFFFFF; letter-spacing:-0.5px; margin-bottom:6px;">
-          Nuevo Registro de Gasto
+        <h1 style="font-size:26px; font-weight:800; color:#FFFFFF; letter-spacing:-0.5px; margin-bottom:4px;">
+          ¿Cuánto gastaste hoy?
         </h1>
-        <p style="font-size:14px; color:var(--text-secondary); max-width:480px; margin:0 auto;">
-          Ingresa de forma inmediata las compras de material, pagos de jornales o compras imprevistas desde cualquier dispositivo móvil.
+        <p style="font-size:13px; color:var(--text-secondary); max-width:380px; margin:0 auto;">
+          Anota compras y jornales en segundos desde la obra.
         </p>
       </div>
 
-      <!-- Quick Register Glass Card -->
-      <div class="glass-panel" style="max-width:640px; margin:0 auto; padding:24px 20px;">
-        <form id="quickRegisterForm" style="display:flex; flex-direction:column; gap:20px;">
+      <!-- Quick Register Form Container -->
+      <div class="glass-panel" style="max-width:520px; margin:0 auto; padding:20px 18px;">
+        <form id="quickRegisterForm" style="display:flex; flex-direction:column; gap:16px;">
           
-          <!-- 1. Category Selector -->
-          <div class="form-group">
-            <label class="form-label">
-              <span>1. Categoría de Gasto</span>
-              <span style="font-size:11px; color:var(--neon-cyan);">Selección rápida</span>
-            </label>
-            <div class="category-grid">
-              
-              <div class="cat-pill active" data-cat="materiales">
-                <div class="cat-icon" style="background:rgba(0,210,255,0.15); color:#00D2FF;">🧱</div>
-                <div class="cat-name">Materiales</div>
-              </div>
-
-              <div class="cat-pill" data-cat="mano-obra">
-                <div class="cat-icon" style="background:rgba(16,185,129,0.15); color:#10B981;">👷</div>
-                <div class="cat-name">Mano de Obra</div>
-              </div>
-
-              <div class="cat-pill" data-cat="herramientas">
-                <div class="cat-icon" style="background:rgba(245,158,11,0.15); color:#F59E0B;">🔨</div>
-                <div class="cat-name">Herramientas</div>
-              </div>
-
-              <div class="cat-pill" data-cat="varios">
-                <div class="cat-icon" style="background:rgba(168,85,247,0.15); color:#A855F7;">📦</div>
-                <div class="cat-name">Gastos Varios</div>
-              </div>
-
+          <!-- 1. Large Amount Input (Fintech Hero) -->
+          <div class="amount-hero-wrapper">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.8px; margin-bottom:4px;">
+              Monto Total del Gasto
+            </span>
+            <div class="amount-input-row">
+              <span class="amount-currency-symbol">$</span>
+              <input 
+                type="text" 
+                inputmode="numeric" 
+                id="quickMontoDisplay" 
+                class="amount-input-field" 
+                placeholder="0"
+                autocomplete="off"
+                required
+              >
             </div>
+            <span id="quickMontoWords" style="font-size:11px; color:var(--text-muted); margin-top:2px; min-height:16px;">
+              Ingresa el valor total
+            </span>
           </div>
 
-          <!-- 2. Description & Quick Chips -->
+          <!-- 2. What was bought? (Description) -->
           <div class="form-group">
-            <label class="form-label" for="quickDescripcion">
-              <span>2. Descripción del Gasto / Artículo</span>
+            <label class="form-label" for="quickDescripcion" style="font-size:13px; font-weight:700;">
+              <span>¿Qué compraste o pagaste?</span>
             </label>
             <input 
               type="text" 
               id="quickDescripcion" 
               class="form-input" 
-              placeholder="Ej. Cemento Argos x 50 bultos, Pago semanal maestro Juan..."
+              placeholder="Ej. Cemento, Arena, Pago maestro Juan..."
               required
               autocomplete="off"
+              style="padding:14px 16px; font-size:15px;"
             >
-            <!-- Quick Suggestion Chips -->
+            
+            <!-- Quick Chips for 1-Tap Entry -->
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
-              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Cemento Gris x 50 bultos'; updateQuickTotal();">Cemento Gris</span>
-              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Arena lavada de río'; updateQuickTotal();">Arena de río</span>
-              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Jornal semanal Maestro de Obra'; updateQuickTotal();">Jornal Maestro</span>
-              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Varilla corrugada 1/2 pulgada'; updateQuickTotal();">Varilla 1/2</span>
-              <span class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border-subtle);" onclick="document.getElementById('quickDescripcion').value='Flete y transporte de materiales'; updateQuickTotal();">Flete</span>
+              <button type="button" class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid var(--border-subtle); padding:5px 10px;" onclick="setQuickSuggestion('Cemento Gris', 'materiales')">🧱 Cemento</button>
+              <button type="button" class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid var(--border-subtle); padding:5px 10px;" onclick="setQuickSuggestion('Arena lavada', 'materiales')">🚛 Arena</button>
+              <button type="button" class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid var(--border-subtle); padding:5px 10px;" onclick="setQuickSuggestion('Jornal Maestro de Obra', 'mano-obra')">👷 Jornal Maestro</button>
+              <button type="button" class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid var(--border-subtle); padding:5px 10px;" onclick="setQuickSuggestion('Varilla 1/2 pulgada', 'materiales')">🔩 Varilla</button>
+              <button type="button" class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid var(--border-subtle); padding:5px 10px;" onclick="setQuickSuggestion('Flete y transporte', 'varios')">🚚 Flete</button>
+              <button type="button" class="badge" style="cursor:pointer; background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid var(--border-subtle); padding:5px 10px;" onclick="setQuickSuggestion('Ladrillo tolete / bloque', 'materiales')">🧱 Ladrillos</button>
             </div>
           </div>
 
-          <!-- 3. Quantity and Unit (2 columns) -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            <div class="form-group">
-              <label class="form-label" for="quickCantidad">3. Cantidad</label>
-              <input 
-                type="number" 
-                id="quickCantidad" 
-                class="form-input" 
-                value="1" 
-                min="0.01" 
-                step="any" 
-                required
-              >
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="quickUnidad">Unidad de Medida</label>
-              <select id="quickUnidad" class="form-select">
-                <option value="unidades">Unidades (und)</option>
-                <option value="bultos" selected>Bultos (blt)</option>
-                <option value="metros">Metros lineales (m)</option>
-                <option value="m³">Metros cúbicos (m³)</option>
-                <option value="m²">Metros cuadrados (m²)</option>
-                <option value="días">Días de labor</option>
-                <option value="semanas">Semanas</option>
-                <option value="viajes">Viajes / Fletes</option>
-                <option value="global">Global (Todo costo)</option>
-                <option value="kg">Kilos (kg)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- 4. Unit Cost & Real-Time Calculation -->
+          <!-- 3. Category Selector (4 Big Touch Buttons) -->
           <div class="form-group">
-            <label class="form-label" for="quickCostoUnitario">
-              <span>4. Costo Unitario ($)</span>
-              <span style="font-size:11px; color:var(--text-muted);">Por unidad/bulto/día</span>
+            <label class="form-label" style="font-size:13px; font-weight:700;">
+              <span>Categoría</span>
             </label>
-            <div class="input-with-icon">
-              <span class="input-icon">$</span>
-              <input 
-                type="number" 
-                id="quickCostoUnitario" 
-                class="form-input" 
-                placeholder="Ej. 32000" 
-                min="0" 
-                step="any" 
-                required
-              >
+            <div class="category-grid-simple">
+              <button type="button" class="cat-btn active" data-cat="materiales">
+                <span>🧱</span> Materiales
+              </button>
+              <button type="button" class="cat-btn" data-cat="mano-obra">
+                <span>👷</span> Mano de Obra
+              </button>
+              <button type="button" class="cat-btn" data-cat="herramientas">
+                <span>🔨</span> Herramientas
+              </button>
+              <button type="button" class="cat-btn" data-cat="varios">
+                <span>📦</span> Varios
+              </button>
             </div>
           </div>
 
-          <!-- Real-Time Total Highlight Card -->
-          <div class="total-highlight-card">
-            <div>
-              <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Costo Total Estimado</div>
-              <div style="font-size:12px; color:var(--text-secondary);">Cantidad × Costo Unitario</div>
-            </div>
-            <div id="quickTotalDisplay" class="total-value-display">
-              $ 0
+          <!-- 4. Optional Details Accordion Toggle -->
+          <div>
+            <button type="button" id="toggleDetailsBtn" class="details-toggle-btn" onclick="toggleQuickDetails()">
+              <span id="detailsToggleIcon">+</span>
+              <span id="detailsToggleText">Añadir detalles (Cantidad, Proveedor, Fecha)</span>
+            </button>
+
+            <!-- Collapsible Details Box -->
+            <div id="quickDetailsBox" style="display:none; margin-top:12px; padding:14px; background:rgba(0,0,0,0.25); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); flex-direction:column; gap:12px;">
+              
+              <!-- Cantidad y Unidad -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group">
+                  <label class="form-label" for="quickCantidad" style="font-size:12px;">Cantidad</label>
+                  <input type="number" id="quickCantidad" class="form-input" value="1" min="0.01" step="any">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="quickUnidad" style="font-size:12px;">Unidad</label>
+                  <select id="quickUnidad" class="form-select" style="padding:12px;">
+                    <option value="global" selected>Global / Paquete</option>
+                    <option value="bultos">Bultos</option>
+                    <option value="unidades">Unidades</option>
+                    <option value="metros">Metros (m)</option>
+                    <option value="m³">Metros cúbicos (m³)</option>
+                    <option value="m²">Metros cuadrados (m²)</option>
+                    <option value="días">Días de labor</option>
+                    <option value="semanas">Semanas</option>
+                    <option value="viajes">Viajes / Fletes</option>
+                    <option value="kg">Kilos (kg)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Fecha y Proveedor -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group">
+                  <label class="form-label" for="quickFecha" style="font-size:12px;">Fecha del Gasto</label>
+                  <input type="date" id="quickFecha" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="quickResponsable" style="font-size:12px;">Proveedor / Responsable</label>
+                  <input type="text" id="quickResponsable" class="form-input" placeholder="Ej. Ferretería Central">
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- 5. Date and Responsible Person / Supplier -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            <div class="form-group">
-              <label class="form-label" for="quickFecha">5. Fecha</label>
-              <input type="date" id="quickFecha" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="quickResponsable">Responsable / Proveedor</label>
-              <input 
-                type="text" 
-                id="quickResponsable" 
-                class="form-input" 
-                placeholder="Ej. Ferretería El Sol"
-              >
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="btn-primary" style="margin-top:6px; font-size:16px;">
+          <!-- 5. Big Prominent Submit Button -->
+          <button type="submit" id="quickSubmitBtn" class="btn-primary" style="padding:16px 20px; font-size:16px; font-weight:800; width:100%; box-shadow:0 6px 24px var(--neon-cyan-glow); margin-top:4px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04060B" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            Registrar Gasto en Obra
+            <span id="quickSubmitBtnText">Registrar Gasto</span>
           </button>
 
         </form>
       </div>
 
       <!-- Recent Expenses Section -->
-      <div style="max-width:640px; margin:32px auto 0 auto;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding:0 4px;">
-          <h3 style="font-size:16px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
-            <span>⏱️</span> Últimos Gastos Registrados
+      <div style="max-width:520px; margin:28px auto 0 auto;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding:0 4px;">
+          <h3 style="font-size:15px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:6px;">
+            <span>⏱️</span> Últimos Registrados
           </h3>
           <button class="btn-secondary" onclick="navigateTo('adminView')" style="padding:6px 12px; font-size:12px;">
             Ver todos en Admin →
           </button>
         </div>
-        <div id="quickRecentList" style="display:flex; flex-direction:column; gap:10px;">
+        <div id="quickRecentList" style="display:flex; flex-direction:column; gap:8px;">
           <!-- Dynamically populated -->
         </div>
       </div>
 
       <!-- Subtle Admin Access Footer Banner -->
-      <div style="max-width:640px; margin:40px auto 0 auto; text-align:center; padding:18px; border-top:1px solid var(--border-subtle);">
+      <div style="max-width:520px; margin:32px auto 0 auto; text-align:center; padding:16px; border-top:1px solid var(--border-subtle);">
         <button onclick="navigateTo('loginView')" style="background:transparent; border:none; color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:color 0.2s;" onmouseover="this.style.color='var(--neon-cyan)'" onmouseout="this.style.color='var(--text-muted)'">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          Acceso Administrativo al Panel de Control
+          Acceso al Panel de Control (Admin)
         </button>
       </div>
 

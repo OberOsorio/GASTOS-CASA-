@@ -221,21 +221,110 @@ function showToast(message, type = 'success') {
   }, 3200);
 }
 
-// Calculation logic for Quick Register
-function updateQuickTotal() {
-  const qtyInput = document.getElementById('quickCantidad');
-  const costInput = document.getElementById('quickCostoUnitario');
-  const totalDisplay = document.getElementById('quickTotalDisplay');
+// Simplified Quick Amount Handling
+let rawQuickAmount = 0;
 
-  const qty = parseFloat(qtyInput?.value) || 0;
-  const cost = parseFloat(costInput?.value) || 0;
-  const total = qty * cost;
+function formatRawAmount(val) {
+  if (!val || val <= 0) return '';
+  return new Intl.NumberFormat('es-CO').format(val);
+}
 
-  if (totalDisplay) {
-    totalDisplay.textContent = formatMoney(total);
+function updateQuickAmountFromInput() {
+  const input = document.getElementById('quickMontoDisplay');
+  const wordsEl = document.getElementById('quickMontoWords');
+  const btnText = document.getElementById('quickSubmitBtnText');
+  
+  if (!input) return;
+
+  // Strip all non-numeric characters
+  const raw = input.value.replace(/\D/g, '');
+  rawQuickAmount = raw ? parseInt(raw, 10) : 0;
+
+  // Format with thousand dots
+  if (rawQuickAmount > 0) {
+    input.value = formatRawAmount(rawQuickAmount);
+    if (wordsEl) {
+      wordsEl.textContent = formatMoney(rawQuickAmount);
+      wordsEl.style.color = 'var(--neon-cyan)';
+    }
+    if (btnText) {
+      btnText.textContent = `Registrar Gasto (${formatMoney(rawQuickAmount)})`;
+    }
+  } else {
+    input.value = '';
+    if (wordsEl) {
+      wordsEl.textContent = 'Ingresa el valor total';
+      wordsEl.style.color = 'var(--text-muted)';
+    }
+    if (btnText) {
+      btnText.textContent = 'Registrar Gasto';
+    }
   }
 }
 
+// 1-Tap Quick Suggestions
+function setQuickSuggestion(desc, catId) {
+  const descInput = document.getElementById('quickDescripcion');
+  const amountInput = document.getElementById('quickMontoDisplay');
+  
+  if (descInput) {
+    descInput.value = desc;
+  }
+
+  // Switch category button
+  if (catId) {
+    currentCategory = catId;
+    const catBtns = document.querySelectorAll('.cat-btn');
+    catBtns.forEach(btn => {
+      if (btn.dataset.cat === catId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  playMicroClick();
+
+  // Focus amount for instant entry
+  if (amountInput) {
+    amountInput.focus();
+  }
+}
+
+// Toggle Optional Details Box
+let detailsExpanded = false;
+function toggleQuickDetails() {
+  const box = document.getElementById('quickDetailsBox');
+  const icon = document.getElementById('detailsToggleIcon');
+  const text = document.getElementById('detailsToggleText');
+
+  detailsExpanded = !detailsExpanded;
+  if (box) {
+    box.style.display = detailsExpanded ? 'flex' : 'none';
+  }
+  if (icon) {
+    icon.textContent = detailsExpanded ? '−' : '+';
+  }
+  if (text) {
+    text.textContent = detailsExpanded ? 'Ocultar detalles adicionales' : 'Añadir detalles (Cantidad, Proveedor, Fecha)';
+  }
+  playMicroClick();
+}
+
+// Update Today's Summary Banner on Hero
+function updateTodaySummary() {
+  const summaryEl = document.getElementById('quickTodaySummary');
+  if (!summaryEl) return;
+
+  const today = new Date().toISOString().split('T')[0];
+  const todayExpenses = expenses.filter(e => e.fecha === today);
+  const todayTotal = todayExpenses.reduce((sum, e) => sum + (e.costoTotal || 0), 0);
+
+  summaryEl.textContent = `Hoy: ${formatMoney(todayTotal)} (${todayExpenses.length})`;
+}
+
+// Edit Modal Total Calculation
 function updateEditTotal() {
   const qtyInput = document.getElementById('editCantidad');
   const costInput = document.getElementById('editCostoUnitario');
@@ -250,35 +339,35 @@ function updateEditTotal() {
   }
 }
 
-// Quick Register Form Submission
+// Quick Register Form Submission (Ultra Easy & Streamlined)
 function handleQuickRegister(e) {
   e.preventDefault();
   
   const descripcion = document.getElementById('quickDescripcion').value.trim();
-  const cantidad = parseFloat(document.getElementById('quickCantidad').value);
-  const unidad = document.getElementById('quickUnidad').value;
-  const costoUnitario = parseFloat(document.getElementById('quickCostoUnitario').value);
-  const fecha = document.getElementById('quickFecha').value;
-  const responsable = document.getElementById('quickResponsable').value.trim();
+  const monto = rawQuickAmount;
 
-  if (!descripcion) {
-    showToast('Por favor escribe la descripción del gasto', 'error');
-    return;
-  }
-  if (!cantidad || cantidad <= 0) {
-    showToast('Ingresa una cantidad válida mayor a 0', 'error');
-    return;
-  }
-  if (isNaN(costoUnitario) || costoUnitario < 0) {
-    showToast('Ingresa un costo unitario válido', 'error');
-    return;
-  }
-  if (!fecha) {
-    showToast('Selecciona la fecha del gasto', 'error');
+  if (!monto || monto <= 0) {
+    showToast('Ingresa el valor o costo del gasto', 'error');
+    document.getElementById('quickMontoDisplay')?.focus();
     return;
   }
 
-  const costoTotal = cantidad * costoUnitario;
+  if (!descripcion) {
+    showToast('Escribe qué compraste o pagaste', 'error');
+    document.getElementById('quickDescripcion')?.focus();
+    return;
+  }
+
+  // Read optional details or apply smart defaults
+  const today = new Date().toISOString().split('T')[0];
+  const cantidad = parseFloat(document.getElementById('quickCantidad')?.value) || 1;
+  const unidad = document.getElementById('quickUnidad')?.value || 'global';
+  const fecha = document.getElementById('quickFecha')?.value || today;
+  const responsable = (document.getElementById('quickResponsable')?.value || '').trim() || 'Obra';
+
+  const costoTotal = monto;
+  const costoUnitario = cantidad > 0 ? (costoTotal / cantidad) : costoTotal;
+
   const newExpense = {
     id: 'gasto-' + Date.now(),
     categoria: currentCategory,
@@ -288,20 +377,24 @@ function handleQuickRegister(e) {
     costoUnitario,
     costoTotal,
     fecha,
-    responsable: responsable || 'Sin especificar'
+    responsable
   };
 
   expenses.unshift(newExpense);
   saveExpenses();
 
-  // Reset form with today's date
+  // Reset form cleanly
+  rawQuickAmount = 0;
+  const amountInput = document.getElementById('quickMontoDisplay');
+  if (amountInput) amountInput.value = '';
   document.getElementById('quickDescripcion').value = '';
-  document.getElementById('quickCantidad').value = '1';
-  document.getElementById('quickCostoUnitario').value = '';
   document.getElementById('quickResponsable').value = '';
-  updateQuickTotal();
+  document.getElementById('quickCantidad').value = '1';
+  document.getElementById('quickUnidad').value = 'global';
+  updateQuickAmountFromInput();
 
-  showToast('¡Gasto registrado con éxito!', 'success');
+  showToast('✓ Gasto registrado con éxito', 'success');
+  updateTodaySummary();
   renderQuickRecentList();
   renderAdminDashboard();
 }
@@ -853,22 +946,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickDateInput = document.getElementById('quickFecha');
   if (quickDateInput) quickDateInput.value = today;
 
-  // Category Selector Pills
-  const catPills = document.querySelectorAll('.cat-pill');
-  catPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      catPills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      currentCategory = pill.dataset.cat;
+  // Category Selector Buttons (.cat-btn)
+  const catBtns = document.querySelectorAll('.cat-btn');
+  catBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = btn.dataset.cat;
       playMicroClick();
     });
   });
 
-  // Real-time calculation on Quick Register
-  const quickQty = document.getElementById('quickCantidad');
-  const quickCost = document.getElementById('quickCostoUnitario');
-  if (quickQty) quickQty.addEventListener('input', updateQuickTotal);
-  if (quickCost) quickCost.addEventListener('input', updateQuickTotal);
+  // Large Amount Input Formatting
+  const amountInput = document.getElementById('quickMontoDisplay');
+  if (amountInput) {
+    amountInput.addEventListener('input', updateQuickAmountFromInput);
+  }
 
   // Real-time calculation on Edit Modal
   const editQty = document.getElementById('editCantidad');
@@ -909,9 +1002,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Render initial view
+  // Render initial view & today's summary
   renderQuickRecentList();
-  updateQuickTotal();
+  updateTodaySummary();
 
   // If already authenticated, show admin badge or state
   if (isAuthenticated()) {
