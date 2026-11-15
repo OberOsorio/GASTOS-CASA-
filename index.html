@@ -117,15 +117,39 @@
             </select>
           </div>
 
-          <!-- 3. Tipo de Material / Concepto (Desplegable Dinámico) -->
+          <!-- 3. Objeto / Material Individual (Desplegable con Buscador Integrado) -->
           <div class="form-group">
-            <label class="form-label" for="quickConceptoSelect">
-              <span>2. Tipo de Material / Concepto</span>
-              <span style="font-size:11px; color:var(--text-muted); font-weight:500;">Catálogo de obra</span>
+            <label class="form-label">
+              <span>2. Objeto / Material Individual</span>
+              <span style="font-size:11px; color:var(--neon-cyan); font-weight:600;">🔍 Con Buscador</span>
             </label>
-            <select id="quickConceptoSelect" class="form-select" onchange="handleQuickConceptoChange(this.value)">
-              <!-- Dynamically populated according to selected category -->
-            </select>
+
+            <div class="searchable-select-wrapper" id="conceptoDropdownWrapper">
+              <input type="hidden" id="quickConceptoValue" value="">
+              
+              <!-- Trigger Button -->
+              <button type="button" id="conceptoTriggerBtn" class="searchable-select-trigger" onclick="toggleConceptoDropdown(event)">
+                <span id="conceptoTriggerText" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🧱 Cemento Gris (Bulto 50kg)</span>
+              </button>
+
+              <!-- Floating Dropdown Menu with Search Box -->
+              <div id="conceptoDropdownMenu" class="searchable-dropdown-menu">
+                <div class="searchable-input-box">
+                  <span class="search-icon">🔍</span>
+                  <input 
+                    type="text" 
+                    id="conceptoSearchInput" 
+                    placeholder="Buscar objeto (ej. Ladrillo, Tubo, Arena, Puntilla...)" 
+                    autocomplete="off"
+                    oninput="filterConceptoOptions(this.value)"
+                    onclick="event.stopPropagation()"
+                  >
+                </div>
+                <div id="conceptoOptionsList" class="searchable-options-list">
+                  <!-- Populated dynamically with individual items -->
+                </div>
+              </div>
+            </div>
 
             <!-- Campo personalizado (solo aparece si elige "Otro / Especificar...") -->
             <div id="customConceptoBox" style="display:none; margin-top:8px;">
@@ -133,7 +157,7 @@
                 type="text" 
                 id="quickDescripcionCustom" 
                 class="form-input" 
-                placeholder="Escribe el nombre o detalle específico del gasto..."
+                placeholder="Escribe el nombre exacto del objeto o gasto..."
                 autocomplete="off"
               >
             </div>

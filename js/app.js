@@ -221,105 +221,279 @@ function showToast(message, type = 'success') {
   }, 3200);
 }
 
-// Construction Catalog by Category (Dynamic Dropdown Options)
+// Catálogo de Objetos Individuales por Categoría (100% separados e individuales)
 const CATALOGO_OBRA = {
   materiales: [
+    // Cementos y Morteros
     { label: '🧱 Cemento Gris (Bulto 50kg)', unit: 'bultos' },
+    { label: '⬜ Cemento Blanco', unit: 'kg' },
+    { label: '🪣 Cal Hidratada (Bulto)', unit: 'bultos' },
+    { label: '🧱 Mortero Listo / Pegacor', unit: 'bultos' },
+    // Agregados y Áridos
     { label: '🚛 Arena de Río Lavada', unit: 'm³' },
-    { label: '🪨 Gravilla / Triturado', unit: 'm³' },
+    { label: '🏜️ Arena de Peña / Revoque', unit: 'm³' },
+    { label: '🪨 Gravilla', unit: 'm³' },
+    { label: '🪨 Triturado de Piedra', unit: 'm³' },
+    { label: '🪨 Recebo / Base Granular', unit: 'm³' },
+    { label: '🪨 Piedra Rajón', unit: 'm³' },
+    // Aceros y Hierros
     { label: '🔩 Varilla Corrugada 1/2"', unit: 'unidades' },
     { label: '🔩 Varilla Corrugada 3/8"', unit: 'unidades' },
-    { label: '🧱 Ladrillo Tolete / Bloque N°4', unit: 'unidades' },
-    { label: '⛓️ Alambre Recocido / Puntillas', unit: 'kg' },
+    { label: '🔩 Varilla Corrugada 5/8"', unit: 'unidades' },
+    { label: '🔩 Varilla Lisa 1/4" (Flejes)', unit: 'unidades' },
+    { label: '📐 Flejes / Estribos Figurados', unit: 'unidades' },
+    { label: '⛓️ Alambre Recocido Negro', unit: 'kg' },
+    { label: '📍 Puntillas con Cabeza (2", 2.5", 3")', unit: 'kg' },
+    { label: '📍 Clavos de Acero', unit: 'kg' },
     { label: '🕸️ Malla Electrosoldada', unit: 'unidades' },
-    { label: '🚰 Tubería y Accesorios PVC', unit: 'unidades' },
-    { label: '⚡ Cableado y Material Eléctrico', unit: 'metros' },
-    { label: '🎨 Estuco, Pintura y Acabados', unit: 'galones' },
-    { label: '🪵 Madera / Tabla / Guadua', unit: 'unidades' },
-    { label: '✨ Cerámica / Porcelanato / Pegante', unit: 'm²' },
-    { label: '💧 Impermeabilizante / Aditivos', unit: 'galones' },
-    { label: '__custom__', text: '✍️ Otro material (Especificar)...', unit: 'unidades' }
+    { label: '🏗️ Perfil Metálico / Correa C', unit: 'unidades' },
+    // Ladrillos y Bloques (Individuales)
+    { label: '🧱 Ladrillo Tolete Común', unit: 'unidades' },
+    { label: '🧱 Ladrillo Farol / H10', unit: 'unidades' },
+    { label: '🧱 Ladrillo Estructural a la Vista', unit: 'unidades' },
+    { label: '🧱 Bloque N°4 de Arcilla', unit: 'unidades' },
+    { label: '🧱 Bloque N°5 de Arcilla', unit: 'unidades' },
+    { label: '🧱 Bloque de Cemento / Concreto', unit: 'unidades' },
+    // Tubería y Plomería (Individuales)
+    { label: '🚰 Tubo PVC Sanitario (4", 3", 2")', unit: 'unidades' },
+    { label: '💧 Tubo PVC Presión Agua Fría (1/2", 3/4")', unit: 'unidades' },
+    { label: '🔥 Tubo CPVC Agua Caliente', unit: 'unidades' },
+    { label: '🔧 Codos PVC / CPVC', unit: 'unidades' },
+    { label: '🔧 Tees y Uniones PVC', unit: 'unidades' },
+    { label: '🔧 Sifones y Yees Sanitarias', unit: 'unidades' },
+    { label: '🚰 Registro / Llave de Paso', unit: 'unidades' },
+    { label: '🧴 Soldadura Líquida PVC y Limpiador', unit: 'unidades' },
+    { label: '🎗️ Cinta Teflón', unit: 'unidades' },
+    { label: '🛢️ Tanque de Almacenamiento de Agua', unit: 'unidades' },
+    { label: '🚽 Combo Sanitario / Lavamanos', unit: 'unidades' },
+    { label: '🚿 Grifería y Ducha', unit: 'unidades' },
+    // Eléctricos (Individuales)
+    { label: '⚡ Cable Eléctrico THHN (#12, #10, #14)', unit: 'metros' },
+    { label: '🟢 Tubería Conduit PVC Eléctrica', unit: 'unidades' },
+    { label: '📦 Cajas Eléctricas (Octogonales / 2x4 / 4x4)', unit: 'unidades' },
+    { label: '🔌 Tomacorrientes', unit: 'unidades' },
+    { label: '💡 Interruptores / Switches', unit: 'unidades' },
+    { label: '⚡ Tablero de Tacos / Breakers', unit: 'unidades' },
+    { label: '⚡ Taco / Breaker Termomagnético', unit: 'unidades' },
+    { label: '💡 Bombillos / Plafones / Paneles LED', unit: 'unidades' },
+    { label: '🎗️ Cinta Aislante Eléctrica', unit: 'unidades' },
+    // Maderas y Cubierta (Individuales)
+    { label: '🪵 Tabla Burra de Madera', unit: 'unidades' },
+    { label: '🪵 Listón / Cuartón de Madera', unit: 'unidades' },
+    { label: '🎍 Guadua / Vara de Clavo', unit: 'unidades' },
+    { label: '🏠 Teja de Fibrocemento / Eternit', unit: 'unidades' },
+    { label: '🏠 Teja de Zinc / Metálica', unit: 'unidades' },
+    { label: '🏠 Teja Termoacústica UPVC / Arquitectónica', unit: 'unidades' },
+    { label: '🏠 Caballete para Techo', unit: 'unidades' },
+    // Acabados, Pintura y Pisos (Individuales)
+    { label: '🎨 Estuco Plástico / En Polvo', unit: 'bultos' },
+    { label: '🎨 Pintura Vinilo Tipo 1 (Blanco / Color)', unit: 'galones' },
+    { label: '🎨 Pintura Esmalte / Anticorrosivo', unit: 'galones' },
+    { label: '📄 Lija para Muro / Madera', unit: 'unidades' },
+    { label: '✨ Cerámica para Piso / Pared', unit: 'm²' },
+    { label: '✨ Porcelanato', unit: 'm²' },
+    { label: '🧱 Pegante para Cerámica / Porcelanato', unit: 'bultos' },
+    { label: '✨ Boquilla / Fragüe para Juntas', unit: 'kg' },
+    { label: '💧 Impermeabilizante (Sika / Bronce)', unit: 'galones' },
+    { label: '⬜ Placa de Drywall / Superboard', unit: 'unidades' },
+    { label: '__custom__', text: '✍️ Otro material específico (Escribir)...', unit: 'unidades' }
   ],
   'mano-obra': [
     { label: '👷 Pago Semanal Maestro de Obra', unit: 'semanas' },
-    { label: '👷‍♂️ Jornal Diario Ayudante / Oficial', unit: 'días' },
-    { label: '🧱 Mano de Obra Mampostería y Pañete', unit: 'global' },
-    { label: '🏗️ Mano de Obra Estructura / Fundición', unit: 'global' },
-    { label: '⚡ Instalaciones Eléctricas (Mano de Obra)', unit: 'global' },
-    { label: '🚰 Instalaciones Hidrosanitarias (Plomería)', unit: 'global' },
-    { label: '🎨 Mano de Obra Estuco, Pintura y Enchape', unit: 'global' },
-    { label: '🏠 Instalación de Cubierta / Techo', unit: 'global' },
-    { label: '__custom__', text: '✍️ Otro pago de mano de obra (Especificar)...', unit: 'global' }
+    { label: '👷 Jornal Diario Maestro de Obra', unit: 'días' },
+    { label: '👷‍♂️ Pago Semanal Oficial de Construcción', unit: 'semanas' },
+    { label: '👷‍♂️ Jornal Diario Oficial de Construcción', unit: 'días' },
+    { label: '🧑 Pago Semanal Ayudante / Obrero', unit: 'semanas' },
+    { label: '🧑 Jornal Diario Ayudante / Obrero', unit: 'días' },
+    { label: '🚜 Mano de Obra Excavación y Cimentación', unit: 'global' },
+    { label: '🏗️ Mano de Obra Armado de Hierro y Columnas', unit: 'global' },
+    { label: '🏗️ Mano de Obra Fundición de Placa / Losa', unit: 'global' },
+    { label: '🧱 Mano de Obra Levante de Muro / Ladrillo', unit: 'm²' },
+    { label: '🧱 Mano de Obra Pañete / Revoque / Repello', unit: 'm²' },
+    { label: '🎨 Mano de Obra Estuco y Pintura', unit: 'm²' },
+    { label: '✨ Mano de Obra Enchape de Pisos y Baños', unit: 'm²' },
+    { label: '⚡ Mano de Obra Electricista', unit: 'global' },
+    { label: '🚰 Mano de Obra Plomero / Hidrosanitario', unit: 'global' },
+    { label: '🏠 Mano de Obra Instalación de Techo / Cubierta', unit: 'global' },
+    { label: '🚪 Mano de Obra Carpintería / Puertas / Ventanas', unit: 'global' },
+    { label: '🔩 Mano de Obra Ornamentador / Soldador', unit: 'global' },
+    { label: '__custom__', text: '✍️ Otro concepto de mano de obra (Escribir)...', unit: 'global' }
   ],
   herramientas: [
     { label: '🔄 Alquiler de Mezcladora (Trompo)', unit: 'días' },
-    { label: '🪜 Alquiler de Andamios y Tableros', unit: 'días' },
-    { label: '🔨 Compra de Herramienta Menor (Palas, Picas)', unit: 'unidades' },
-    { label: '⚙️ Discos de Corte, Brocas y Pulidora', unit: 'unidades' },
-    { label: '🛒 Carretilla Buggy de Obra', unit: 'unidades' },
-    { label: '⚡ Alquiler de Rana Compactadora / Vibrador', unit: 'días' },
-    { label: '__custom__', text: '✍️ Otra herramienta o equipo (Especificar)...', unit: 'unidades' }
+    { label: '🪜 Alquiler de Andamios', unit: 'días' },
+    { label: '🔩 Alquiler de Tacos Metálicos / Cerchas', unit: 'días' },
+    { label: '📳 Alquiler de Vibrador de Concreto', unit: 'días' },
+    { label: '🚜 Alquiler de Rana Compactadora / Canguro', unit: 'días' },
+    { label: '🛒 Compra de Carretilla Buggy', unit: 'unidades' },
+    { label: ' лопата Compra de Pala', unit: 'unidades' },
+    { label: '⛏️ Compra de Pica / Barreton', unit: 'unidades' },
+    { label: '🔨 Compra de Palustre / Llana', unit: 'unidades' },
+    { label: '🔨 Compra de Martillo / Maceta / Cincel', unit: 'unidades' },
+    { label: '🪣 Compra de Baldes de Construcción', unit: 'unidades' },
+    { label: '⚙️ Disco Diamantado de Corte', unit: 'unidades' },
+    { label: '🔩 Brocas para Muro / Concreto', unit: 'unidades' },
+    { label: '🖌️ Rodillos y Brochas para Pintar', unit: 'unidades' },
+    { label: '📏 Nivel / Plomada / Flexómetro / Hilo', unit: 'unidades' },
+    { label: '🧤 Guantes, Cascos y Botas de Seguridad', unit: 'unidades' },
+    { label: '__custom__', text: '✍️ Otra herramienta o alquiler (Escribir)...', unit: 'unidades' }
   ],
   varios: [
     { label: '🚚 Flete / Transporte de Materiales', unit: 'viajes' },
-    { label: '⚡ Pago de Servicios Provisionales (Agua / Luz)', unit: 'global' },
-    { label: '📄 Licencias, Planos y Trámites', unit: 'global' },
-    { label: '🗑️ Retiro de Escombros (Volqueta)', unit: 'viajes' },
-    { label: '🥤 Refrigerios e Hidratación Personal', unit: 'global' },
-    { label: '🔒 Seguridad y Cerramiento de Obra', unit: 'global' },
-    { label: '__custom__', text: '✍️ Otro gasto vario (Especificar)...', unit: 'global' }
+    { label: '🗑️ Viaje de Volqueta Retiro de Escombros', unit: 'viajes' },
+    { label: '💧 Recibo / Servicio Provisional de Agua', unit: 'global' },
+    { label: '⚡ Recibo / Servicio Provisional de Energía', unit: 'global' },
+    { label: '📄 Licencia de Construcción y Curaduría', unit: 'global' },
+    { label: '📐 Diseño de Planos Arquitectónicos / Estructurales', unit: 'global' },
+    { label: '🥤 Refrigerios, Agua e Hidratación de Obra', unit: 'global' },
+    { label: '🍱 Almuerzos Personal de Obra', unit: 'unidades' },
+    { label: '🔒 Vigilancia / Celaduría de Obra', unit: 'días' },
+    { label: '🔒 Candados, Cadenas y Cerramiento', unit: 'unidades' },
+    { label: '🧹 Aseo y Limpieza General de Obra', unit: 'global' },
+    { label: '__custom__', text: '✍️ Otro gasto vario (Escribir)...', unit: 'global' }
   ]
 };
 
-// Populate Concepto Select based on Category
+// Clean up any stray characters in labels
+CATALOGO_OBRA.herramientas.forEach(item => {
+  if (item.label.includes('лопата')) item.label = '🛠️ Compra de Pala de Obra';
+});
+
+// State for Searchable Concepto Dropdown
+let currentConceptoList = [];
+
 function populateConceptoDropdown(catId) {
-  const selectEl = document.getElementById('quickConceptoSelect');
-  const unitEl = document.getElementById('quickUnidad');
-  const customBox = document.getElementById('customConceptoBox');
-  if (!selectEl) return;
+  currentConceptoList = CATALOGO_OBRA[catId] || CATALOGO_OBRA.materiales;
+  const searchInput = document.getElementById('conceptoSearchInput');
+  if (searchInput) searchInput.value = '';
 
-  const list = CATALOGO_OBRA[catId] || CATALOGO_OBRA.materiales;
-  selectEl.innerHTML = list.map((item, idx) => {
-    const val = item.label === '__custom__' ? '__custom__' : item.label;
-    const text = item.text || item.label;
-    return `<option value="${escapeHtml(val)}" data-unit="${item.unit}" ${idx === 0 ? 'selected' : ''}>${escapeHtml(text)}</option>`;
-  }).join('');
+  renderConceptoOptionsList(currentConceptoList);
 
-  // Auto-update unit to match first item
-  if (unitEl && list[0]) {
-    unitEl.value = list[0].unit;
-  }
-  if (customBox) {
-    customBox.style.display = 'none';
+  // Select first item by default
+  if (currentConceptoList.length > 0) {
+    selectConceptoItem(currentConceptoList[0].label, currentConceptoList[0].unit, false);
   }
 }
+
+function renderConceptoOptionsList(items) {
+  const listContainer = document.getElementById('conceptoOptionsList');
+  const currentVal = document.getElementById('quickConceptoValue')?.value;
+  if (!listContainer) return;
+
+  if (items.length === 0) {
+    listContainer.innerHTML = `
+      <div style="padding:14px; text-align:center; color:var(--text-muted); font-size:13px;">
+        No se encontró ese objeto.
+        <div style="margin-top:8px;">
+          <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="selectConceptoItem('__custom__', 'unidades', true)">
+            ✍️ Escribir manualmente
+          </button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  listContainer.innerHTML = items.map(item => {
+    const val = item.label;
+    const displayText = item.text || item.label;
+    const isSelected = val === currentVal;
+    const safeVal = escapeHtml(val).replace(/'/g, "\\'");
+    return `
+      <div class="searchable-option-item ${isSelected ? 'selected' : ''}" onclick="selectConceptoItem('${safeVal}', '${item.unit}', true)">
+        <span>${escapeHtml(displayText)}</span>
+        <span class="unit-hint">${escapeHtml(item.unit)}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterConceptoOptions(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) {
+    renderConceptoOptionsList(currentConceptoList);
+    return;
+  }
+
+  // Normalize accents for easy Spanish searching (e.g., "tuberia" matches "Tubería")
+  const normalize = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const qNorm = normalize(q);
+
+  const filtered = currentConceptoList.filter(item => {
+    const text = item.text || item.label;
+    return normalize(text).includes(qNorm) || item.label === '__custom__';
+  });
+
+  renderConceptoOptionsList(filtered);
+}
+
+function toggleConceptoDropdown(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('conceptoDropdownMenu');
+  const trigger = document.getElementById('conceptoTriggerBtn');
+  const searchInput = document.getElementById('conceptoSearchInput');
+  if (!menu) return;
+
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) {
+    closeConceptoDropdown();
+  } else {
+    menu.classList.add('open');
+    if (trigger) trigger.classList.add('open');
+    if (searchInput) {
+      searchInput.value = '';
+      filterConceptoOptions('');
+      setTimeout(() => searchInput.focus(), 50);
+    }
+    playMicroClick();
+  }
+}
+
+function closeConceptoDropdown() {
+  const menu = document.getElementById('conceptoDropdownMenu');
+  const trigger = document.getElementById('conceptoTriggerBtn');
+  if (menu) menu.classList.remove('open');
+  if (trigger) trigger.classList.remove('open');
+}
+
+function selectConceptoItem(val, unit, userClicked = true) {
+  const hiddenInput = document.getElementById('quickConceptoValue');
+  const triggerText = document.getElementById('conceptoTriggerText');
+  const unitEl = document.getElementById('quickUnidad');
+  const customBox = document.getElementById('customConceptoBox');
+  const customInput = document.getElementById('quickDescripcionCustom');
+
+  if (hiddenInput) hiddenInput.value = val;
+
+  if (val === '__custom__') {
+    if (triggerText) triggerText.textContent = '✍️ Otro objeto (Especificar)...';
+    if (customBox) customBox.style.display = 'block';
+    if (userClicked && customInput) setTimeout(() => customInput.focus(), 50);
+  } else {
+    if (triggerText) triggerText.textContent = val;
+    if (customBox) customBox.style.display = 'none';
+  }
+
+  if (unitEl && unit) {
+    unitEl.value = unit;
+  }
+
+  closeConceptoDropdown();
+  if (userClicked) playMicroClick();
+}
+
+// Close searchable dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const wrapper = document.getElementById('conceptoDropdownWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    closeConceptoDropdown();
+  }
+});
 
 // Handle Category Dropdown Change
 function handleQuickCategoryChange(catId) {
   currentCategory = catId;
   populateConceptoDropdown(catId);
-  playMicroClick();
-}
-
-// Handle Concepto Dropdown Change
-function handleQuickConceptoChange(val) {
-  const selectEl = document.getElementById('quickConceptoSelect');
-  const customBox = document.getElementById('customConceptoBox');
-  const customInput = document.getElementById('quickDescripcionCustom');
-  const unitEl = document.getElementById('quickUnidad');
-
-  if (val === '__custom__') {
-    if (customBox) customBox.style.display = 'block';
-    if (customInput) customInput.focus();
-  } else {
-    if (customBox) customBox.style.display = 'none';
-    // Set recommended unit from selected option
-    if (selectEl && unitEl) {
-      const selectedOpt = selectEl.options[selectEl.selectedIndex];
-      const recommendedUnit = selectedOpt?.getAttribute('data-unit');
-      if (recommendedUnit) unitEl.value = recommendedUnit;
-    }
-  }
   playMicroClick();
 }
 
@@ -423,7 +597,7 @@ function updateEditTotal() {
   }
 }
 
-// Quick Register Form Submission (Professional Dropdown Driven)
+// Quick Register Form Submission (Professional Searchable Dropdown Driven)
 function handleQuickRegister(e) {
   e.preventDefault();
   
@@ -438,16 +612,14 @@ function handleQuickRegister(e) {
   const catSelect = document.getElementById('quickCategoriaSelect');
   const categoria = catSelect ? catSelect.value : currentCategory;
 
-  // Get selected material/concepto or custom input
-  const conceptoSelect = document.getElementById('quickConceptoSelect');
-  let descripcion = conceptoSelect ? conceptoSelect.value : '';
-  // Remove leading emoji for clean record if desired, or keep it clean
-  descripcion = descripcion.replace(/^[^\w\sÁÉÍÓÚáéíóúÑñ]+\s*/, '').trim();
+  // Get selected individual object or custom input
+  const conceptoVal = document.getElementById('quickConceptoValue')?.value || '';
+  let descripcion = conceptoVal.replace(/^[^\w\sÁÉÍÓÚáéíóúÑñ]+\s*/, '').trim();
 
-  if (conceptoSelect && conceptoSelect.value === '__custom__') {
+  if (conceptoVal === '__custom__' || !descripcion) {
     const customDesc = (document.getElementById('quickDescripcionCustom')?.value || '').trim();
     if (!customDesc) {
-      showToast('Especifica el nombre del material o gasto', 'error');
+      showToast('Especifica el nombre del objeto o gasto', 'error');
       document.getElementById('quickDescripcionCustom')?.focus();
       return;
     }
